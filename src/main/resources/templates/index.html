@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/base :: header('Home')}"></head>
+<body>
+
+    <nav th:replace="~{fragments/base :: navbar}"></nav>
+    <div th:replace="~{fragments/base :: alerts}"></div>
+
+    <header class="bg-dark text-white py-5 mb-4 text-center">
+        <div class="container">
+            <h1 class="fw-bold mb-2">CineFest</h1>
+            <p class="lead text-light col-lg-7 mx-auto mb-4">
+                I migliori festival del cinema, i film in concorso e il programma delle proiezioni in sala.
+            </p>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <a th:href="@{/festivals}" class="btn btn-warning fw-semibold">Festival</a>
+                <a th:href="@{/film}" class="btn btn-outline-light">Film</a>
+                <a th:href="@{/proiezioni}" class="btn btn-outline-light">Programma</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container my-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 fw-bold">Festival in Programma</h2>
+            <a th:href="@{/festivals}" class="btn btn-sm btn-outline-secondary">Vedi tutti &rarr;</a>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-6" th:each="fest : ${festivals}">
+                <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                    <img th:if="${fest.immagineUrl != null}" th:src="${fest.immagineUrl}" th:alt="${fest.nome}" class="festival-banner">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h3 class="h5 card-title fw-bold mb-0 text-dark" th:text="${fest.nome}">Nome Festival</h3>
+                            <span class="badge bg-warning text-dark" th:text="${fest.anno}">2026</span>
+                        </div>
+                        <p class="text-muted small mb-2">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i><span th:text="${fest.citta}">Città</span> &bull; 
+                            <span th:text="${#temporals.format(fest.dataInizio, 'dd/MM')}">01/09</span> - 
+                            <span th:text="${#temporals.format(fest.dataFine, 'dd/MM/yyyy')}">10/09/2026</span>
+                        </p>
+                        <p class="card-text text-secondary small mb-3" th:text="${#strings.abbreviate(fest.descrizione, 130)}">Descrizione...</p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+                            <span class="small text-muted">
+                                <span th:text="${fest.filmPartecipanti.size()}">0</span> film in concorso
+                            </span>
+                            <a th:href="@{'/festivals/' + ${fest.id}}" class="btn btn-sm btn-dark">Dettagli &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 fw-bold">Film in Concorso</h2>
+            <a th:href="@{/film}" class="btn btn-sm btn-outline-secondary">Vedi tutti &rarr;</a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-6 col-md-3" th:each="film : ${filmList}">
+                <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                    <a th:href="@{'/film/' + ${film.id}}">
+                        <img th:if="${film.locandinaUrl != null}" th:src="${film.locandinaUrl}" th:alt="${film.titolo}" class="film-poster">
+                        <div th:unless="${film.locandinaUrl != null}" class="film-poster bg-light d-flex align-items-center justify-content-center text-muted">
+                            <i class="bi bi-camera-reels fs-1"></i>
+                        </div>
+                    </a>
+                    <div class="card-body d-flex flex-column p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <span class="badge bg-light text-dark border small" th:text="${film.genere}">Drammatico</span>
+                            <span class="badge bg-light text-dark border small" th:text="${film.anno}">2024</span>
+                        </div>
+                        <h4 class="h6 card-title fw-bold text-dark mb-1 mt-1">
+                            <a th:href="@{'/film/' + ${film.id}}" class="text-decoration-none text-dark" th:text="${film.titolo}">Titolo Film</a>
+                        </h4>
+                        <p class="small text-muted mb-2">
+                            Regia: <span th:text="${film.regista != null ? film.regista.nomeCompleto : 'N/D'}">Regista</span>
+                        </p>
+                        <div class="mt-auto pt-2 d-flex justify-content-between align-items-center border-top">
+                            <span class="star-rating small">
+                                &#9733; <strong th:text="${film.mediaVoti}">4.5</strong>
+                            </span>
+                            <a th:href="@{'/film/' + ${film.id}}" class="btn btn-sm btn-outline-dark">Scheda</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/base :: footer}"></footer>
+
+</body>
+</html>

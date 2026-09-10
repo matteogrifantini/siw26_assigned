@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/base :: header(${film.titolo})}"></head>
+<body>
+
+    <nav th:replace="~{fragments/base :: navbar}"></nav>
+    <div th:replace="~{fragments/base :: alerts}"></div>
+
+    <main class="container my-5">
+        <div class="card shadow-sm p-4 mb-5 border-0 bg-white">
+            <div class="row align-items-start">
+                <div class="col-md-3 text-center mb-3 mb-md-0" th:if="${film.locandinaUrl != null}">
+                    <img th:src="${film.locandinaUrl}" class="film-poster-lg shadow-sm" th:alt="${film.titolo}">
+                </div>
+                <div th:class="${film.locandinaUrl != null} ? 'col-md-6' : 'col-md-8'">
+                    <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                        <span class="badge bg-secondary" th:text="${film.genere}">Drammatico</span>
+                        <span class="badge bg-light text-dark border" th:text="${film.anno}">2024</span>
+                        <span class="badge bg-light text-dark border" th:text="${film.durata} + ' minuti'">120 min</span>
+                        <span class="badge bg-light text-dark border" th:text="${film.paeseProduzione}">Italia</span>
+                    </div>
+                    <h1 class="display-5 fw-bold text-dark mb-2" th:text="${film.titolo}">Titolo del Film</h1>
+                    
+                    <p class="fs-5 text-muted mb-3">
+                        Regia di: 
+                        <a th:if="${film.regista != null}" th:href="@{'/registi/' + ${film.regista.id}}" 
+                           class="text-decoration-none fw-bold text-dark" th:text="${film.regista.nomeCompleto}">
+                            Nome Regista
+                        </a>
+                        <span th:if="${film.regista == null}">Non specificato</span>
+                    </p>
+
+                    <div th:if="${film.descrizione != null and !film.descrizione.isBlank()}" class="mt-3">
+                        <h6 class="fw-bold text-dark mb-1">Sinossi</h6>
+                        <p class="text-secondary mb-0" th:text="${film.descrizione}">Descrizione del film...</p>
+                    </div>
+                </div>
+                <div th:class="${film.locandinaUrl != null} ? 'col-md-3 text-md-end mt-3 mt-md-0' : 'col-md-4 text-md-end mt-3 mt-md-0'">
+                    <div class="p-3 bg-light rounded-3 d-inline-block text-center border w-100" style="max-width: 200px;">
+                        <span class="text-muted small d-block">Valutazione Media</span>
+                        <span class="display-6 fw-bold text-warning">
+                            <i class="bi bi-star-fill me-1"></i><span th:text="${film.mediaVoti}">4.8</span>
+                        </span>
+                        <span class="small text-muted d-block">su <span th:text="${recensioni.size()}">0</span> recensioni</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100 p-3">
+                    <h2 class="h5 fw-bold mb-3"><i class="bi bi-trophy text-warning me-2"></i>Festival a cui partecipa</h2>
+                    <div th:if="${film.festival.isEmpty()}" class="text-muted small">
+                        Il film non è attualmente associato ad alcun festival.
+                    </div>
+                    <ul class="list-group list-group-flush" th:unless="${film.festival.isEmpty()}">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0" th:each="fest : ${film.festival}">
+                            <a th:href="@{'/festivals/' + ${fest.id}}" class="text-decoration-none fw-semibold text-dark" th:text="${fest.nome}">Nome Festival</a>
+                            <span class="badge bg-warning text-dark" th:text="${fest.anno}">2026</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100 p-3">
+                    <h2 class="h5 fw-bold mb-3"><i class="bi bi-calendar-event text-primary me-2"></i>Proiezioni in Programma</h2>
+                    <div th:if="${film.proiezioni.isEmpty()}" class="text-muted small">
+                        Nessuna proiezione in programma per questo film.
+                    </div>
+                    <ul class="list-group list-group-flush" th:unless="${film.proiezioni.isEmpty()}">
+                        <li class="list-group-item px-0" th:each="p : ${film.proiezioni}">
+                            <div class="d-flex justify-content-between">
+                                <strong><i class="bi bi-calendar3 me-1"></i><span th:text="${#temporals.format(p.data, 'dd/MM/yyyy')}">Data</span> ore <span th:text="${p.ora}">18:00</span></strong>
+                                <span class="badge bg-success" th:text="${p.stato.etichetta}">Programmata</span>
+                            </div>
+                            <div class="small text-muted mt-1">
+                                Presso <strong><span th:text="${p.sala.nome}">Sala</span></strong> (<span th:text="${p.sala.indirizzo}">Indirizzo</span>) - <span th:text="${p.festival.nome}">Festival</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <section class="card shadow-sm p-4 border-0">
+            <h2 class="h4 fw-bold mb-4"><i class="bi bi-chat-quote-fill text-warning me-2"></i>Recensioni del Pubblico</h2>
+
+            <div sec:authorize="isAnonymous()" class="alert alert-secondary d-flex justify-content-between align-items-center">
+                <span>Vuoi scrivere una recensione per questo film?</span>
+                <a th:href="@{/login}" class="btn btn-warning btn-sm fw-bold">Accedi per recensire</a>
+            </div>
+
+            <div th:if="${haGiaRecensito and propriaRecensione != null}" class="card border-warning mb-4 bg-light">
+                <div class="card-header bg-warning text-dark fw-bold d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-person-check-fill me-1"></i>La tua recensione per questo film</span>
+                    <span class="small" th:text="${#temporals.format(propriaRecensione.data, 'dd/MM/yyyy')}">Data</span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2 text-warning">
+                        <span th:each="i : ${#numbers.sequence(1, propriaRecensione.voto)}"><i class="bi bi-star-fill"></i></span>
+                        <strong class="text-dark ms-2" th:text="${propriaRecensione.voto} + '/5'">5/5</strong>
+                    </div>
+                    <p class="card-text text-dark" th:text="${propriaRecensione.testo}">Testo recensione...</p>
+                    <div class="d-flex gap-2 mt-3">
+                        <a th:href="@{'/recensioni/modifica/' + ${propriaRecensione.id}}" class="btn btn-outline-dark btn-sm">
+                            <i class="bi bi-pencil me-1"></i>Modifica
+                        </a>
+                        <form th:action="@{'/recensioni/elimina/' + ${propriaRecensione.id}}" method="post" onsubmit="return confirm('Sei sicuro di voler eliminare la tua recensione?');">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash me-1"></i>Elimina
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div sec:authorize="isAuthenticated()" th:if="${!haGiaRecensito}" class="card p-3 mb-4 border-light bg-light">
+                <h3 class="h6 fw-bold mb-3">Scrivi la tua recensione</h3>
+                <form th:action="@{'/recensioni/salva/' + ${film.id}}" method="post">
+                    <div class="mb-3">
+                        <label for="voto" class="form-label fw-semibold">Voto (da 1 a 5 stelle)</label>
+                        <select id="voto" name="voto" class="form-select w-auto" required>
+                            <option value="5">★★★★★ - 5 (Eccellente)</option>
+                            <option value="4">★★★★☆ - 4 (Ottimo)</option>
+                            <option value="3" selected>★★★☆☆ - 3 (Buono)</option>
+                            <option value="2">★★☆☆☆ - 2 (Sufficiente)</option>
+                            <option value="1">★☆☆☆☆ - 1 (Scarso)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="testo" class="form-label fw-semibold">Testo della recensione</label>
+                        <textarea id="testo" name="testo" rows="3" class="form-control" placeholder="Scrivi qui la tua opinione sul film..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-warning fw-bold">
+                        <i class="bi bi-send me-1"></i>Pubblica Recensione
+                    </button>
+                </form>
+            </div>
+
+            <div th:if="${recensioni.isEmpty()}" class="text-muted text-center py-4">
+                Non ci sono ancora recensioni per questo film. Sii il primo a recensirlo!
+            </div>
+
+            <div class="d-flex flex-column gap-3" th:unless="${recensioni.isEmpty()}">
+                <div class="card border p-3" th:each="r : ${recensioni}">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <strong class="text-dark" th:text="${r.autore.nome + ' ' + r.autore.cognome}">Autore</strong>
+                            <span class="text-muted small ms-2" th:text="${#temporals.format(r.data, 'dd/MM/yyyy')}">01/01/2026</span>
+                        </div>
+                        <div class="text-warning">
+                            <span th:each="i : ${#numbers.sequence(1, r.voto)}"><i class="bi bi-star-fill"></i></span>
+                            <span class="text-dark fw-bold small ms-1" th:text="${r.voto} + '/5'">5/5</span>
+                        </div>
+                    </div>
+                    <p class="mb-0 text-secondary" th:text="${r.testo}">Testo della recensione...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer th:replace="~{fragments/base :: footer}"></footer>
+
+</body>
+</html>

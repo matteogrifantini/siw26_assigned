@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: header('Elenco Festival')}"></head>
+<body>
+
+    <nav th:replace="~{fragments/base :: navbar}"></nav>
+    <div th:replace="~{fragments/base :: alerts}"></div>
+
+    <main class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <div>
+                <h1 class="h2 fw-bold"><i class="bi bi-trophy text-warning me-2"></i>Festival Cinematografici</h1>
+                <p class="text-muted mb-0">Rassegne ed edizioni registrate nel sistema informativo</p>
+            </div>
+        </div>
+
+        <div th:if="${festivals.isEmpty()}" class="alert alert-info">
+            Nessun festival attualmente registrato.
+        </div>
+
+        <div class="row g-4" th:unless="${festivals.isEmpty()}">
+            <div class="col-md-6" th:each="fest : ${festivals}">
+                <div class="card h-100 shadow-sm border-0">
+                    <img th:if="${fest.immagineUrl != null}" th:src="${fest.immagineUrl}" class="festival-banner" th:alt="${fest.nome}">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h2 class="h5 card-title fw-bold text-dark" th:text="${fest.nome}">Nome Festival</h2>
+                            <span class="badge bg-warning text-dark fw-bold" th:text="${fest.anno}">2026</span>
+                        </div>
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i><span th:text="${fest.citta}">Città</span> | 
+                            <i class="bi bi-calendar-event me-1"></i>
+                            <span th:text="${#temporals.format(fest.dataInizio, 'dd/MM/yyyy')}">Inizio</span> - 
+                            <span th:text="${#temporals.format(fest.dataFine, 'dd/MM/yyyy')}">Fine</span>
+                        </p>
+                        <p class="card-text text-secondary mb-4" th:text="${fest.descrizione}">Descrizione del festival cinematografico...</p>
+
+                        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                            <span class="small text-muted">
+                                <i class="bi bi-camera-reels me-1"></i><strong><span th:text="${fest.filmPartecipanti.size()}">0</span></strong> film
+                            </span>
+                            <a th:href="@{'/festivals/' + ${fest.id}}" class="btn btn-dark btn-sm">
+                                Vedi Scheda e Film &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/base :: footer}"></footer>
+
+</body>
+</html>
