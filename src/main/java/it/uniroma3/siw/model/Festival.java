@@ -47,6 +47,9 @@ public class Festival {
     @Column(length = 3000)
     private String descrizione;
 
+    @Column(length = 500)
+    private String immagineUrl;
+
     @ManyToMany
     @JoinTable(
         name = "festival_film",
@@ -68,6 +71,16 @@ public class Festival {
         this.dataInizio = dataInizio;
         this.dataFine = dataFine;
         this.descrizione = descrizione;
+    }
+
+    public Festival(String nome, Integer anno, String citta, LocalDate dataInizio, LocalDate dataFine, String descrizione, String immagineUrl) {
+        this.nome = nome;
+        this.anno = anno;
+        this.citta = citta;
+        this.dataInizio = dataInizio;
+        this.dataFine = dataFine;
+        this.descrizione = descrizione;
+        this.immagineUrl = immagineUrl;
     }
 
     // Metodi di utilità per associare/dissociare film
@@ -141,6 +154,14 @@ public class Festival {
 
     public void setDescrizione(String descrizione) {
         this.descrizione = descrizione;
+    }
+
+    public String getImmagineUrl() {
+        return immagineUrl;
+    }
+
+    public void setImmagineUrl(String immagineUrl) {
+        this.immagineUrl = immagineUrl;
     }
 
     public List<Film> getFilmPartecipanti() {

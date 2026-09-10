@@ -40,6 +40,12 @@ public class Film {
     @Column(nullable = false)
     private String paeseProduzione;
 
+    @Column(length = 2000)
+    private String descrizione;
+
+    @Column(length = 500)
+    private String locandinaUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "regista_id")
     private Regista regista;
@@ -62,6 +68,17 @@ public class Film {
         this.durata = durata;
         this.genere = genere;
         this.paeseProduzione = paeseProduzione;
+        this.regista = regista;
+    }
+
+    public Film(String titolo, Integer anno, Integer durata, String genere, String paeseProduzione, String descrizione, String locandinaUrl, Regista regista) {
+        this.titolo = titolo;
+        this.anno = anno;
+        this.durata = durata;
+        this.genere = genere;
+        this.paeseProduzione = paeseProduzione;
+        this.descrizione = descrizione;
+        this.locandinaUrl = locandinaUrl;
         this.regista = regista;
     }
 
@@ -133,6 +150,22 @@ public class Film {
 
     public void setRegista(Regista regista) {
         this.regista = regista;
+    }
+
+    public String getDescrizione() {
+        return descrizione;
+    }
+
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
+    }
+
+    public String getLocandinaUrl() {
+        return locandinaUrl;
+    }
+
+    public void setLocandinaUrl(String locandinaUrl) {
+        this.locandinaUrl = locandinaUrl;
     }
 
     public List<Festival> getFestival() {

@@ -35,6 +35,12 @@ public class Regista {
     @Column(nullable = false)
     private String nazionalita;
 
+    @Column(length = 2000)
+    private String biografia;
+
+    @Column(length = 500)
+    private String fotoUrl;
+
     @OneToMany(mappedBy = "regista", cascade = CascadeType.ALL)
     private List<Film> filmDiretti = new ArrayList<>();
 
@@ -46,6 +52,15 @@ public class Regista {
         this.cognome = cognome;
         this.dataNascita = dataNascita;
         this.nazionalita = nazionalita;
+    }
+
+    public Regista(String nome, String cognome, LocalDate dataNascita, String nazionalita, String biografia, String fotoUrl) {
+        this.nome = nome;
+        this.cognome = cognome;
+        this.dataNascita = dataNascita;
+        this.nazionalita = nazionalita;
+        this.biografia = biografia;
+        this.fotoUrl = fotoUrl;
     }
 
     // Getter e Setter
@@ -88,6 +103,22 @@ public class Regista {
 
     public void setNazionalita(String nazionalita) {
         this.nazionalita = nazionalita;
+    }
+
+    public String getBiografia() {
+        return biografia;
+    }
+
+    public void setBiografia(String biografia) {
+        this.biografia = biografia;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 
     public List<Film> getFilmDiretti() {
