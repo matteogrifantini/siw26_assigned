@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: header('Registrazione')}"></head>
+<body>
+
+    <nav th:replace="~{fragments/base :: navbar}"></nav>
+    <div th:replace="~{fragments/base :: alerts}"></div>
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow p-4">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-plus-fill text-warning display-4"></i>
+                        <h2 class="h4 fw-bold mt-2">Crea un nuovo account</h2>
+                        <p class="text-muted small">Registrati per poter recensire i film dei festival</p>
+                    </div>
+
+                    <form th:action="@{/register}" method="post">
+                        <h5 class="fw-bold border-bottom pb-2 mb-3 text-secondary">Dati Personali</h5>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="nome" class="form-label fw-semibold">Nome</label>
+                                <input type="text" id="nome" th:field="${utente.nome}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('utente.nome')} ? 'is-invalid' : ''" placeholder="Mario">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('utente.nome')}" th:errors="${utente.nome}"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cognome" class="form-label fw-semibold">Cognome</label>
+                                <input type="text" id="cognome" th:field="${utente.cognome}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('utente.cognome')} ? 'is-invalid' : ''" placeholder="Rossi">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('utente.cognome')}" th:errors="${utente.cognome}"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">Email</label>
+                            <input type="email" id="email" th:field="${utente.email}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('utente.email')} ? 'is-invalid' : ''" placeholder="mario.rossi@email.com">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('utente.email')}" th:errors="${utente.email}"></div>
+                        </div>
+
+                        <h5 class="fw-bold border-bottom pb-2 mb-3 mt-4 text-secondary">Credenziali di Accesso</h5>
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-semibold">Username</label>
+                            <input type="text" id="username" th:field="${credentials.username}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('credentials.username')} ? 'is-invalid' : ''" placeholder="mariorossi">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('credentials.username')}" th:errors="${credentials.username}"></div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-semibold">Password</label>
+                            <input type="password" id="password" th:field="${credentials.password}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('credentials.password')} ? 'is-invalid' : ''" placeholder="Almeno 4 caratteri">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('credentials.password')}" th:errors="${credentials.password}"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning w-100 fw-bold py-2">
+                            <i class="bi bi-check2-circle me-1"></i> Completa Registrazione
+                        </button>
+                    </form>
+
+                    <div class="mt-4 text-center border-top pt-3">
+                        <p class="small text-muted mb-0">Hai già un account?
+                            <a th:href="@{/login}" class="fw-bold text-decoration-none">Accedi qui</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/base :: footer}"></footer>
+
+</body>
+</html>
