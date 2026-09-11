@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: header(${regista.id == null ? 'Nuovo Regista' : 'Modifica Regista'})}"></head>
+<body>
+
+    <nav th:replace="~{fragments/base :: navbar}"></nav>
+    <div th:replace="~{fragments/base :: alerts}"></div>
+
+    <main class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-7">
+                <div class="card shadow p-4 border-0">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h1 class="h4 fw-bold text-dark mb-0">
+                            <i class="bi bi-person-video text-warning me-2"></i>
+                            <span th:text="${regista.id == null ? 'Nuovo Regista' : 'Modifica Regista'}">Nuovo Regista</span>
+                        </h1>
+                        <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary btn-sm">Annulla</a>
+                    </div>
+
+                    <form th:action="@{/admin/registi/salva}" th:object="${regista}" method="post">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="nome" class="form-label fw-semibold">Nome *</label>
+                                <input type="text" id="nome" th:field="*{nome}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid' : ''" placeholder="es. Denis">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cognome" class="form-label fw-semibold">Cognome *</label>
+                                <input type="text" id="cognome" th:field="*{cognome}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('cognome')} ? 'is-invalid' : ''" placeholder="es. Villeneuve">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('cognome')}" th:errors="*{cognome}"></div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="dataNascita" class="form-label fw-semibold">Data di Nascita *</label>
+                                <input type="date" id="dataNascita" th:field="*{dataNascita}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('dataNascita')} ? 'is-invalid' : ''">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('dataNascita')}" th:errors="*{dataNascita}"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="nazionalita" class="form-label fw-semibold">Nazionalità *</label>
+                                <input type="text" id="nazionalita" th:field="*{nazionalita}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('nazionalita')} ? 'is-invalid' : ''" placeholder="es. Canadese">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('nazionalita')}" th:errors="*{nazionalita}"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fotoUrl" class="form-label fw-semibold">URL o Percorso Foto</label>
+                            <input type="text" id="fotoUrl" th:field="*{fotoUrl}" class="form-control" placeholder="/images/registi/nolan.jpg">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="biografia" class="form-label fw-semibold">Biografia</label>
+                            <textarea id="biografia" th:field="*{biografia}" rows="3" class="form-control" placeholder="Breve biografia del regista..."></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a th:href="@{/admin/dashboard}" class="btn btn-secondary">Annulla</a>
+                            <button type="submit" class="btn btn-warning fw-bold">
+                                <i class="bi bi-check-circle me-1"></i>Salva Regista
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/base :: footer}"></footer>
+
+</body>
+</html>

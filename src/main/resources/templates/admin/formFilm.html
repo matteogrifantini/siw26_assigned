@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: header(${film.id == null ? 'Nuovo Film' : 'Modifica Film'})}"></head>
+<body>
+
+    <nav th:replace="~{fragments/base :: navbar}"></nav>
+    <div th:replace="~{fragments/base :: alerts}"></div>
+
+    <main class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow p-4 border-0">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h1 class="h4 fw-bold text-dark mb-0">
+                            <i class="bi bi-camera-reels text-warning me-2"></i>
+                            <span th:text="${film.id == null ? 'Nuovo Film' : 'Modifica Film'}">Nuovo Film</span>
+                        </h1>
+                        <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary btn-sm">Annulla</a>
+                    </div>
+
+                    <form th:action="@{/admin/film/salva}" th:object="${film}" method="post">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="titolo" class="form-label fw-semibold">Titolo Film *</label>
+                                <input type="text" id="titolo" th:field="*{titolo}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('titolo')} ? 'is-invalid' : ''" placeholder="es. Oppenheimer">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('titolo')}" th:errors="*{titolo}"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="anno" class="form-label fw-semibold">Anno di Uscita *</label>
+                                <input type="number" id="anno" th:field="*{anno}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('anno')} ? 'is-invalid' : ''" placeholder="2023">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('anno')}" th:errors="*{anno}"></div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="registaId" class="form-label fw-semibold">Regista *</label>
+                                <select id="registaId" name="registaId" class="form-select" required>
+                                    <option value="">-- Seleziona Regista --</option>
+                                    <option th:each="r : ${registi}" th:value="${r.id}" th:text="${r.nomeCompleto}"
+                                            th:selected="${film.regista != null && film.regista.id == r.id}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="genere" class="form-label fw-semibold">Genere *</label>
+                                <input type="text" id="genere" th:field="*{genere}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('genere')} ? 'is-invalid' : ''" placeholder="es. Fantascienza, Drammatico">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('genere')}" th:errors="*{genere}"></div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="durata" class="form-label fw-semibold">Durata (minuti) *</label>
+                                <input type="number" id="durata" th:field="*{durata}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('durata')} ? 'is-invalid' : ''" placeholder="120">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('durata')}" th:errors="*{durata}"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="paeseProduzione" class="form-label fw-semibold">Paese di Produzione *</label>
+                                <input type="text" id="paeseProduzione" th:field="*{paeseProduzione}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('paeseProduzione')} ? 'is-invalid' : ''" placeholder="es. Italia, USA">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('paeseProduzione')}" th:errors="*{paeseProduzione}"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="locandinaUrl" class="form-label fw-semibold">URL o Percorso Locandina</label>
+                            <input type="text" id="locandinaUrl" th:field="*{locandinaUrl}" class="form-control" placeholder="/images/film/oppenheimer.jpg">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="descrizione" class="form-label fw-semibold">Sinossi / Trama</label>
+                            <textarea id="descrizione" th:field="*{descrizione}" rows="3" class="form-control" placeholder="Descrizione o sinossi del film..."></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a th:href="@{/admin/dashboard}" class="btn btn-secondary">Annulla</a>
+                            <button type="submit" class="btn btn-dark fw-bold">
+                                <i class="bi bi-check-circle me-1"></i>Salva Film
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/base :: footer}"></footer>
+
+</body>
+</html>

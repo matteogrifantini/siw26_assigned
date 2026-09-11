@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: header(${sala.id == null ? 'Nuova Sala' : 'Modifica Sala'})}"></head>
+<body>
+
+    <nav th:replace="~{fragments/base :: navbar}"></nav>
+    <div th:replace="~{fragments/base :: alerts}"></div>
+
+    <main class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow p-4 border-0">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                        <h1 class="h4 fw-bold text-dark mb-0">
+                            <i class="bi bi-door-open text-warning me-2"></i>
+                            <span th:text="${sala.id == null ? 'Nuova Sala' : 'Modifica Sala'}">Nuova Sala</span>
+                        </h1>
+                        <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary btn-sm">Annulla</a>
+                    </div>
+
+                    <form th:action="@{/admin/sale/salva}" th:object="${sala}" method="post">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="mb-3">
+                            <label for="nome" class="form-label fw-semibold">Nome Sala *</label>
+                            <input type="text" id="nome" th:field="*{nome}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid' : ''" placeholder="es. Sala Grande">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="indirizzo" class="form-label fw-semibold">Indirizzo *</label>
+                            <input type="text" id="indirizzo" th:field="*{indirizzo}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('indirizzo')} ? 'is-invalid' : ''" placeholder="es. Lungomare Marconi, 10">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('indirizzo')}" th:errors="*{indirizzo}"></div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="capienza" class="form-label fw-semibold">Capienza Posti *</label>
+                            <input type="number" id="capienza" th:field="*{capienza}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('capienza')} ? 'is-invalid' : ''" placeholder="es. 400">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('capienza')}" th:errors="*{capienza}"></div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a th:href="@{/admin/dashboard}" class="btn btn-secondary">Annulla</a>
+                            <button type="submit" class="btn btn-warning fw-bold">
+                                <i class="bi bi-check-circle me-1"></i>Salva Sala
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/base :: footer}"></footer>
+
+</body>
+</html>

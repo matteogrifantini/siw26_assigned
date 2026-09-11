@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: header('Associa Film al Festival')}"></head>
+<body>
+
+    <nav th:replace="~{fragments/base :: navbar}"></nav>
+    <div th:replace="~{fragments/base :: alerts}"></div>
+
+    <main class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+            <div>
+                <h1 class="h3 fw-bold text-dark mb-0">
+                    <i class="bi bi-film text-warning me-2"></i>Gestione Film per: 
+                    <span class="text-primary" th:text="${festival.nome + ' (' + festival.anno + ')'}">Festival</span>
+                </h1>
+                <p class="text-muted small mb-0">Associa nuovi film al festival o rimuovi film partecipanti</p>
+            </div>
+            <a th:href="@{/admin/dashboard}" class="btn btn-outline-secondary btn-sm">&larr; Torna alla Dashboard</a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-7">
+                <div class="card shadow-sm p-4 border-0">
+                    <h2 class="h5 fw-bold mb-3">Film Partecipanti (<span th:text="${festival.filmPartecipanti.size()}">0</span>)</h2>
+
+                    <div th:if="${festival.filmPartecipanti.isEmpty()}" class="alert alert-light border">
+                        Nessun film attualmente associato a questo festival.
+                    </div>
+
+                    <ul class="list-group" th:unless="${festival.filmPartecipanti.isEmpty()}">
+                        <li class="list-group-item d-flex justify-content-between align-items-center" th:each="film : ${festival.filmPartecipanti}">
+                            <div>
+                                <strong class="text-dark" th:text="${film.titolo}">Titolo</strong>
+                                <span class="small text-muted ms-2" th:text="'(' + ${film.anno} + ', ' + ${film.durata} + ' min)'"></span>
+                                <div class="small text-muted" th:text="'Regia: ' + ${film.regista != null ? film.regista.nomeCompleto : 'N/D'}"></div>
+                            </div>
+                            <form th:action="@{'/admin/festivals/' + ${festival.id} + '/rimuovi-film/' + ${film.id}}" method="post" onsubmit="return confirm('Rimuovere questo film dal festival?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Rimuovi dal festival">
+                                    <i class="bi bi-x-circle me-1"></i>Rimuovi
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="card shadow-sm p-4 border-0 bg-light">
+                    <h2 class="h5 fw-bold mb-3">Associa un Film</h2>
+
+                    <div th:if="${filmDisponibili.isEmpty()}" class="alert alert-info small">
+                        Tutti i film presenti a catalogo sono già stati associati a questo festival!
+                    </div>
+
+                    <form th:unless="${filmDisponibili.isEmpty()}" th:action="@{'/admin/festivals/' + ${festival.id} + '/associa-film'}" method="post">
+                        <div class="mb-3">
+                            <label for="filmId" class="form-label fw-semibold">Seleziona Film da associare:</label>
+                            <select id="filmId" name="filmId" class="form-select" required>
+                                <option value="">-- Seleziona Film --</option>
+                                <option th:each="film : ${filmDisponibili}" th:value="${film.id}"
+                                        th:text="${film.titolo + ' (' + film.anno + ') - Regia: ' + (film.regista != null ? film.regista.nomeCompleto : 'N/D')}"></option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning fw-bold w-100">
+                            <i class="bi bi-plus-lg me-1"></i>Associa Film al Festival
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/base :: footer}"></footer>
+
+</body>
+</html>
