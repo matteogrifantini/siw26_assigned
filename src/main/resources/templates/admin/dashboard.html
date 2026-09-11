@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: header('Dashboard Amministratore')}"></head>
+<body>
+
+    <nav th:replace="~{fragments/base :: navbar}"></nav>
+    <div th:replace="~{fragments/base :: alerts}"></div>
+
+    <main class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <div>
+                <span class="badge bg-danger mb-2">Area Riservata Amministratore</span>
+                <h1 class="h2 fw-bold text-dark"><i class="bi bi-speedometer2 text-danger me-2"></i>Pannello di Gestione</h1>
+                <p class="text-muted mb-0">Gestisci festival, film, registi, sale e programmazione proiezioni</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/admin/festivals/nuovo}" class="btn btn-warning btn-sm fw-bold">
+                    <i class="bi bi-plus-circle me-1"></i>Nuovo Festival
+                </a>
+                <a th:href="@{/admin/film/nuovo}" class="btn btn-dark btn-sm fw-bold">
+                    <i class="bi bi-plus-circle me-1"></i>Nuovo Film
+                </a>
+                <a th:href="@{/admin/proiezioni/nuova}" class="btn btn-primary btn-sm fw-bold">
+                    <i class="bi bi-calendar-plus me-1"></i>Programma Proiezione
+                </a>
+                <a th:href="@{/analisi-prestazioni}" class="btn btn-outline-secondary btn-sm" title="Analisi Prestazioni LAZY vs JOIN FETCH">
+                    <i class="bi bi-speedometer2 me-1"></i>Analisi N+1
+                </a>
+            </div>
+        </div>
+
+        <ul class="nav nav-pills mb-4" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="festivals-tab" data-bs-toggle="tab" data-bs-target="#festivals" type="button">
+                    <i class="bi bi-trophy me-1"></i>Festival (<span th:text="${festivals.size()}">0</span>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="films-tab" data-bs-toggle="tab" data-bs-target="#films" type="button">
+                    <i class="bi bi-camera-reels me-1"></i>Film (<span th:text="${films.size()}">0</span>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="registi-tab" data-bs-toggle="tab" data-bs-target="#registi" type="button">
+                    <i class="bi bi-person-video me-1"></i>Registi (<span th:text="${registi.size()}">0</span>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="sale-tab" data-bs-toggle="tab" data-bs-target="#sale" type="button">
+                    <i class="bi bi-door-open me-1"></i>Sale (<span th:text="${sale.size()}">0</span>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="proiezioni-tab" data-bs-toggle="tab" data-bs-target="#proiezioni" type="button">
+                    <i class="bi bi-calendar3 me-1"></i>Proiezioni (<span th:text="${proiezioni.size()}">0</span>)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="adminTabsContent">
+            <div class="tab-pane fade show active" id="festivals" role="tabpanel">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 fw-bold">Elenco Festival</h5>
+                        <a th:href="@{/admin/festivals/nuovo}" class="btn btn-warning btn-sm fw-bold">Aggiungi Festival</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Anno</th>
+                                    <th>Città</th>
+                                    <th>Date</th>
+                                    <th>Film</th>
+                                    <th class="text-end">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="f : ${festivals}">
+                                    <td><strong th:text="${f.nome}">Nome</strong></td>
+                                    <td><span class="badge bg-secondary" th:text="${f.anno}">2026</span></td>
+                                    <td th:text="${f.citta}">Città</td>
+                                    <td th:text="${#temporals.format(f.dataInizio, 'dd/MM')} + ' - ' + ${#temporals.format(f.dataFine, 'dd/MM/yyyy')}">Date</td>
+                                    <td><span class="badge bg-info text-dark" th:text="${f.filmPartecipanti.size()} + ' film'">0 film</span></td>
+                                    <td class="text-end">
+                                        <a th:href="@{'/admin/festivals/' + ${f.id} + '/associa-film'}" class="btn btn-sm btn-outline-primary" title="Associa Film">
+                                            <i class="bi bi-film"></i> Associa Film
+                                        </a>
+                                        <a th:href="@{'/admin/festivals/modifica/' + ${f.id}}" class="btn btn-sm btn-outline-dark" title="Modifica">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form th:action="@{'/admin/festivals/elimina/' + ${f.id}}" method="post" class="d-inline" onsubmit="return confirm('Eliminare questo festival? Verranno eliminate anche le sue proiezioni.');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Elimina">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="films" role="tabpanel">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 fw-bold">Elenco Film</h5>
+                        <a th:href="@{/admin/film/nuovo}" class="btn btn-dark btn-sm fw-bold">Aggiungi Film</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Titolo</th>
+                                    <th>Anno</th>
+                                    <th>Regista</th>
+                                    <th>Genere / Durata</th>
+                                    <th>Paese</th>
+                                    <th class="text-end">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="film : ${films}">
+                                    <td><strong th:text="${film.titolo}">Titolo</strong></td>
+                                    <td th:text="${film.anno}">2024</td>
+                                    <td th:text="${film.regista != null ? film.regista.nomeCompleto : 'N/D'}">Regista</td>
+                                    <td>
+                                        <span class="badge bg-secondary" th:text="${film.genere}">Genere</span>
+                                        <span class="small text-muted ms-1" th:text="${film.durata} + ' min'">120 min</span>
+                                    </td>
+                                    <td th:text="${film.paeseProduzione}">USA</td>
+                                    <td class="text-end">
+                                        <a th:href="@{'/admin/film/modifica/' + ${film.id}}" class="btn btn-sm btn-outline-dark">
+                                            <i class="bi bi-pencil"></i> Modifica
+                                        </a>
+                                        <form th:action="@{'/admin/film/elimina/' + ${film.id}}" method="post" class="d-inline" onsubmit="return confirm('Eliminare questo film?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="registi" role="tabpanel">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 fw-bold">Elenco Registi</h5>
+                        <a th:href="@{/admin/registi/nuovo}" class="btn btn-warning btn-sm fw-bold">Aggiungi Regista</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome Completo</th>
+                                    <th>Data di Nascita</th>
+                                    <th>Nazionalità</th>
+                                    <th>Film Diretti</th>
+                                    <th class="text-end">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="r : ${registi}">
+                                    <td><strong th:text="${r.nomeCompleto}">Nome</strong></td>
+                                    <td th:text="${#temporals.format(r.dataNascita, 'dd/MM/yyyy')}">Data</td>
+                                    <td th:text="${r.nazionalita}">Nazionalità</td>
+                                    <td><span class="badge bg-secondary" th:text="${r.filmDiretti.size()} + ' film'">0 film</span></td>
+                                    <td class="text-end">
+                                        <a th:href="@{'/admin/registi/modifica/' + ${r.id}}" class="btn btn-sm btn-outline-dark">
+                                            <i class="bi bi-pencil"></i> Modifica
+                                        </a>
+                                        <form th:action="@{'/admin/registi/elimina/' + ${r.id}}" method="post" class="d-inline" onsubmit="return confirm('Eliminare questo regista?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="sale" role="tabpanel">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 fw-bold">Elenco Sale Cinematografiche</h5>
+                        <a th:href="@{/admin/sale/nuova}" class="btn btn-warning btn-sm fw-bold">Aggiungi Sala</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome Sala</th>
+                                    <th>Indirizzo</th>
+                                    <th>Capienza Posti</th>
+                                    <th>Proiezioni Ospitate</th>
+                                    <th class="text-end">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="s : ${sale}">
+                                    <td><strong th:text="${s.nome}">Sala</strong></td>
+                                    <td th:text="${s.indirizzo}">Indirizzo</td>
+                                    <td><span class="badge bg-success" th:text="${s.capienza} + ' posti'">0 posti</span></td>
+                                    <td><span class="badge bg-secondary" th:text="${s.proiezioni.size()}">0</span></td>
+                                    <td class="text-end">
+                                        <a th:href="@{'/admin/sale/modifica/' + ${s.id}}" class="btn btn-sm btn-outline-dark">
+                                            <i class="bi bi-pencil"></i> Modifica
+                                        </a>
+                                        <form th:action="@{'/admin/sale/elimina/' + ${s.id}}" method="post" class="d-inline" onsubmit="return confirm('Eliminare questa sala?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="proiezioni" role="tabpanel">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 fw-bold">Programmazione Proiezioni</h5>
+                        <a th:href="@{/admin/proiezioni/nuova}" class="btn btn-primary btn-sm fw-bold">
+                            <i class="bi bi-calendar-plus me-1"></i>Programma Nuova Proiezione
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Data e Orario</th>
+                                    <th>Film</th>
+                                    <th>Festival</th>
+                                    <th>Sala</th>
+                                    <th>Stato</th>
+                                    <th class="text-end">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${proiezioni}">
+                                    <td>
+                                        <strong th:text="${#temporals.format(p.data, 'dd/MM/yyyy')}">Data</strong>
+                                        <span class="badge bg-dark ms-1" th:text="${p.ora} + ' - ' + ${p.oraFine}">Orario</span>
+                                    </td>
+                                    <td th:text="${p.film.titolo}">Film</td>
+                                    <td th:text="${p.festival.nome}">Festival</td>
+                                    <td th:text="${p.sala.nome}">Sala</td>
+                                    <td><span class="badge bg-success" th:text="${p.stato.etichetta}">Programmata</span></td>
+                                    <td class="text-end">
+                                        <form th:action="@{'/admin/proiezioni/elimina/' + ${p.id}}" method="post" class="d-inline" onsubmit="return confirm('Cancellare questa proiezione?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i> Annulla/Elimina
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/base :: footer}"></footer>
+
+</body>
+</html>
