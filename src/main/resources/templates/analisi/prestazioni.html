@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: header('Analisi Prestazioni')}"></head>
+<body>
+
+    <nav th:replace="~{fragments/base :: navbar}"></nav>
+    <div th:replace="~{fragments/base :: alerts}"></div>
+
+    <main class="container my-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h1 class="h3 fw-bold mb-1">Analisi Prestazioni Accesso Dati</h1>
+                <p class="text-muted small mb-0">
+                    Confronto tra strategia <strong>LAZY</strong> (problema N+1) e <strong>JOIN FETCH</strong>.
+                </p>
+            </div>
+            <a th:href="@{/}" class="btn btn-outline-secondary btn-sm">&larr; Torna alla Home</a>
+        </div>
+
+        <div class="card p-3 mb-4 bg-light border-0 shadow-sm">
+            <form th:action="@{/analisi-prestazioni}" method="get" class="row g-2 align-items-center">
+                <div class="col-auto">
+                    <label for="festivalId" class="col-form-label col-form-label-sm fw-bold">Festival:</label>
+                </div>
+                <div class="col-md-5">
+                    <select id="festivalId" name="festivalId" class="form-select form-select-sm">
+                        <option th:each="f : ${festivals}" th:value="${f.id}" 
+                                th:text="${f.nome + ' (' + f.anno + ')'}"
+                                th:selected="${selectedFestival != null && selectedFestival.id == f.id}"></option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-sm btn-primary">Esegui Test</button>
+                </div>
+            </form>
+        </div>
+
+        <div th:if="${risultato != null}">
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="card h-100 border-danger shadow-sm">
+                        <div class="card-header bg-danger text-white fw-bold">
+                            Strategia 1: LAZY (N+1 Query)
+                        </div>
+                        <div class="card-body">
+                            <p class="small text-muted mb-3">
+                                Caricamento con <code>FetchType.LAZY</code>: per ogni film viene eseguita una query separata per ottenere il regista.
+                            </p>
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <td>Film caricati:</td>
+                                        <td class="text-end fw-bold" th:text="${risultato.strategiaLazy.filmCaricati}">0</td>
+                                    </tr>
+                                    <tr class="table-danger">
+                                        <td>Query SQL:</td>
+                                        <td class="text-end"><strong class="fs-5 text-danger" th:text="${risultato.strategiaLazy.querySql}">0</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tempo:</td>
+                                        <td class="text-end" th:text="${risultato.strategiaLazy.tempoMs} + ' ms'">0 ms</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card h-100 border-success shadow-sm">
+                        <div class="card-header bg-success text-white fw-bold">
+                            Strategia 2: JOIN FETCH
+                        </div>
+                        <div class="card-body">
+                            <p class="small text-muted mb-3">
+                                Query JPQL con <code>JOIN FETCH</code>: film e registi vengono caricati insieme con una singola query SQL.
+                            </p>
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <td>Film caricati:</td>
+                                        <td class="text-end fw-bold" th:text="${risultato.strategiaJoinFetch.filmCaricati}">0</td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td>Query SQL:</td>
+                                        <td class="text-end"><strong class="fs-5 text-success" th:text="${risultato.strategiaJoinFetch.querySql}">1</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tempo:</td>
+                                        <td class="text-end" th:text="${risultato.strategiaJoinFetch.tempoMs} + ' ms'">0 ms</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-dark text-light p-3 shadow-sm">
+                <div class="small text-secondary fw-bold mb-2">Output console generato:</div>
+                <pre class="mb-0 text-white" style="font-size: 0.9rem;">
+=== Test accesso ai film del festival ===
+
+Strategia 1: LAZY
+Film caricati: <span th:text="${risultato.strategiaLazy.filmCaricati}"></span>
+Query SQL: <span th:text="${risultato.strategiaLazy.querySql}"></span>
+Tempo: <span th:text="${risultato.strategiaLazy.tempoMs}"></span> ms
+
+Strategia 2: JOIN FETCH
+Film caricati: <span th:text="${risultato.strategiaJoinFetch.filmCaricati}"></span>
+Query SQL: <span th:text="${risultato.strategiaJoinFetch.querySql}"></span>
+Tempo: <span th:text="${risultato.strategiaJoinFetch.tempoMs}"></span> ms
+                </pre>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/base :: footer}"></footer>
+
+</body>
+</html>
