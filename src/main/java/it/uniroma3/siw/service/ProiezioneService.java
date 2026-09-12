@@ -116,6 +116,7 @@ public class ProiezioneService {
         proiezioneRepository.deleteById(id);
     }
 
+    // Requisito Sezione 4.3 & 7: Controllo consistenza disponibilità sala (blocco sovrapposizione orari)
     private void verificaDisponibilitaSala(Sala sala, LocalDate data, LocalTime inizio, LocalTime fine, Long proiezioneDaIgnorareId) {
         List<Proiezione> proiezioniGiorno = proiezioneRepository.findBySalaAndData(sala, data);
 
